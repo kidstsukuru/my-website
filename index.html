@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ジャンケンゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ジャンケン！</h1>
+        <div class="buttons">
+            <button onclick="playGame('rock')">グー</button>
+            <button onclick="playGame('scissors')">チョキ</button>
+            <button onclick="playGame('paper')">パー</button>
+        </div>
+        <p id="player-choice">あなたの手: まだ選択されていません</p>
+        <p id="computer-choice">コンピュータの手: まだ選択されていません</p>
+        <p id="result">結果: さあ、勝負！</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
