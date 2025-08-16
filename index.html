@@ -1,159 +1,186 @@
-import React, { useState } from 'react';
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストファイル ダウンローダー</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-black flex flex-col items-center p-4">
+    <div id="root" class="w-full max-w-3xl"></div>
 
-function App() {
-  const [codeText, setCodeText] = useState('');
-  const [fileName, setFileName] = useState(''); // State for filename
-  const [selectedLanguage, setSelectedLanguage] = useState('txt'); // New state for selected language, default to 'txt'
-  const [message, setMessage] = useState('');
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX transformation in browser (for development only) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  // Options for programming languages and their extensions
-  const languageOptions = [
-    { label: 'テキストファイル (.txt)', value: 'txt' },
-    { label: 'JavaScript (.js)', value: 'js' },
-    { label: 'Python (.py)', value: 'py' },
-    { label: 'HTML (.html)', value: 'html' },
-    { label: 'CSS (.css)', value: 'css' },
-    { label: 'JSON (.json)', value: 'json' },
-    { label: 'Markdown (.md)', value: 'md' },
-    { label: 'Java (.java)', value: 'java' },
-    { label: 'C++ (.cpp)', value: 'cpp' },
-    { label: 'C# (.cs)', value: 'cs' },
-    { label: 'PHP (.php)', value: 'php' },
-    { label: 'Ruby (.rb)', value: 'rb' },
-    { label: 'Swift (.swift)', value: 'swift' },
-    { label: 'TypeScript (.ts)', value: 'ts' },
-    { label: 'XML (.xml)', value: 'xml' },
-  ];
+    <script type="text/babel">
+        // Reactコンポーネントの定義
+        function App() {
+            const [codeText, setCodeText] = React.useState('');
+            const [fileName, setFileName] = React.useState(''); // ファイル名の状態
+            const [selectedLanguage, setSelectedLanguage] = React.useState('txt'); // 選択された言語の状態、デフォルトは'txt'
+            const [message, setMessage] = React.useState('');
 
-  const handleDownloadToPC = () => {
-    if (!codeText) {
-      setMessage("ダウンロードするテキストがありません。");
-      return;
-    }
+            // プログラミング言語と拡張子のオプション
+            const languageOptions = [
+                { label: 'テキストファイル (.txt)', value: 'txt' },
+                { label: 'JavaScript (.js)', value: 'js' },
+                { label: 'Python (.py)', value: 'py' },
+                { label: 'HTML (.html)', value: 'html' },
+                { label: 'CSS (.css)', value: 'css' },
+                { label: 'JSON (.json)', value: 'json' },
+                { label: 'Markdown (.md)', value: 'md' },
+                { label: 'Java (.java)', value: 'java' },
+                { label: 'C++ (.cpp)', value: 'cpp' },
+                { label: 'C# (.cs)', value: 'cs' },
+                { label: 'PHP (.php)', value: 'php' },
+                { label: 'Ruby (.rb)', value: 'rb' },
+                { label: 'Swift (.swift)', value: 'swift' },
+                { label: 'TypeScript (.ts)', value: 'ts' },
+                { label: 'XML (.xml)', value: 'xml' },
+            ];
 
-    let finalFileName = fileName.trim();
-    const extensionFromSelection = selectedLanguage;
+            // PCにダウンロードするハンドラ
+            const handleDownloadToPC = () => {
+                if (!codeText) {
+                    setMessage("ダウンロードするテキストがありません。");
+                    return;
+                }
 
-    // Check if the user-provided fileName already has an extension
-    const hasUserProvidedExtension = finalFileName.includes('.');
+                let finalFileName = fileName.trim();
+                const extensionFromSelection = selectedLanguage;
 
-    if (!hasUserProvidedExtension && extensionFromSelection) {
-      // If no extension in user-provided fileName and a language is selected, append the selected extension
-      if (finalFileName === '') {
-        finalFileName = `code_snippet.${extensionFromSelection}`;
-      } else {
-        finalFileName = `${finalFileName}.${extensionFromSelection}`;
-      }
-    } else if (finalFileName === '') {
-      // If fileName is empty and no specific language is selected (or default 'txt'), use default with .txt
-      finalFileName = `code_snippet.txt`;
-    }
-    // If hasUserProvidedExtension is true, finalFileName remains as is.
+                // ユーザーが指定したファイル名に拡張子が含まれているか確認
+                const hasUserProvidedExtension = finalFileName.includes('.');
 
-    // Create a Blob from the codeText
-    const blob = new Blob([codeText], { type: 'text/plain' });
-    // Create a URL for the Blob
-    const url = URL.createObjectURL(blob);
-    // Create a temporary anchor element
-    const a = document.createElement('a');
-    a.href = url;
-    // Set the download attribute to specify the filename
-    a.download = finalFileName;
-    // Programmatically click the anchor to trigger download
-    document.body.appendChild(a); // Append to body to ensure it's in the DOM
-    a.click();
-    // Clean up: remove the anchor and revoke the object URL
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+                if (!hasUserProvidedExtension && extensionFromSelection) {
+                    // ユーザー指定のファイル名に拡張子がなく、言語が選択されている場合、選択された拡張子を付加
+                    if (finalFileName === '') {
+                        finalFileName = `code_snippet.${extensionFromSelection}`;
+                    } else {
+                        finalFileName = `${finalFileName}.${extensionFromSelection}`;
+                    }
+                } else if (finalFileName === '') {
+                    // ファイル名が空で、特定の言語が選択されていない（またはデフォルトの'txt'）場合、デフォルトの.txtを使用
+                    finalFileName = `code_snippet.txt`;
+                }
+                // hasUserProvidedExtensionがtrueの場合、finalFileNameはそのまま
 
-    setMessage(`'${finalFileName}' をPCにダウンロードしました。`);
-  };
+                // codeTextからBlobを作成
+                const blob = new Blob([codeText], { type: 'text/plain' });
+                // BlobのURLを作成
+                const url = URL.createObjectURL(blob);
+                // 一時的なアンカー要素を作成
+                const a = document.createElement('a');
+                a.href = url;
+                // ダウンロード属性を設定してファイル名を指定
+                a.download = finalFileName;
+                // プログラムでアンカーをクリックしてダウンロードをトリガー
+                document.body.appendChild(a); // DOMに追加して確実に動作させる
+                a.click();
+                // クリーンアップ: アンカーを削除し、オブジェクトURLを解放
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
 
-  // Function to handle reset button click
-  const handleReset = () => {
-    setCodeText(''); // Clear the code/text area
-    setFileName(''); // Clear the filename input
-    setSelectedLanguage('txt'); // Reset language selection to default
-    setMessage('入力内容がリセットされました。'); // Set a message
-  };
+                setMessage(`'${finalFileName}' をPCにダウンロードしました。`);
+            };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-black flex flex-col items-center p-4 font-inter">
-      <div className="bg-gray-800 bg-opacity-70 border border-blue-700 p-6 rounded-lg shadow-lg shadow-blue-500/50 w-full max-w-3xl">
-        <h1 className="text-3xl font-bold text-center text-white mb-6 rounded-md p-2 bg-blue-800 shadow-md shadow-blue-500/30">
-          テキストファイル ダウンローダー
-        </h1>
+            // リセットボタンのクリックを処理する関数
+            const handleReset = () => {
+                setCodeText(''); // コード/テキストエリアをクリア
+                setFileName(''); // ファイル名入力をクリア
+                setSelectedLanguage('txt'); // 言語選択をデフォルトにリセット
+                setMessage('入力内容がリセットされました。'); // メッセージを設定
+            };
 
-        <div className="mb-4">
-          <label htmlFor="codeText" className="block text-gray-200 text-sm font-bold mb-2">
-            コード/テキスト:
-          </label>
-          <textarea
-            id="codeText"
-            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700 h-64 resize-y font-mono"
-            value={codeText}
-            onChange={(e) => setCodeText(e.target.value)}
-            placeholder="ここにコードやテキストを入力してください..."
-          ></textarea>
-        </div>
+            return (
+                <div className="bg-gray-800 bg-opacity-70 border border-blue-700 p-6 rounded-lg shadow-lg shadow-blue-500/50 w-full max-w-3xl">
+                    <h1 className="text-3xl font-bold text-center text-white mb-6 rounded-md p-2 bg-blue-800 shadow-md shadow-blue-500/30">
+                        テキストファイル ダウンローダー
+                    </h1>
 
-        <div className="mb-4">
-          <label htmlFor="fileName" className="block text-gray-200 text-sm font-bold mb-2">
-            ファイル名 (オプション):
-          </label>
-          <input
-            type="text"
-            id="fileName"
-            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            placeholder="例: my_script または my_notes"
-          />
-        </div>
+                    <div className="mb-4">
+                        <label htmlFor="codeText" className="block text-gray-200 text-sm font-bold mb-2">
+                            コード/テキスト:
+                        </label>
+                        <textarea
+                            id="codeText"
+                            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700 h-64 resize-y font-mono"
+                            value={codeText}
+                            onChange={(e) => setCodeText(e.target.value)}
+                            placeholder="ここにコードやテキストを入力してください..."
+                        ></textarea>
+                    </div>
 
-        <div className="mb-6">
-          <label htmlFor="languageSelect" className="block text-gray-200 text-sm font-bold mb-2">
-            ファイルの種類:
-          </label>
-          <select
-            id="languageSelect"
-            className="shadow border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-          >
-            {languageOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+                    <div className="mb-4">
+                        <label htmlFor="fileName" className="block text-gray-200 text-sm font-bold mb-2">
+                            ファイル名 (オプション):
+                        </label>
+                        <input
+                            type="text"
+                            id="fileName"
+                            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
+                            value={fileName}
+                            onChange={(e) => setFileName(e.target.value)}
+                            placeholder="例: my_script または my_notes"
+                        />
+                    </div>
 
-        <div className="flex justify-center space-x-4 mb-4">
-          <button
-            onClick={handleDownloadToPC}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-purple-500/30"
-            disabled={!codeText}
-          >
-            PCにダウンロード
-          </button>
-          <button
-            onClick={handleReset}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-red-500/30"
-          >
-            リセット
-          </button>
-        </div>
+                    <div className="mb-6">
+                        <label htmlFor="languageSelect" className="block text-gray-200 text-sm font-bold mb-2">
+                            ファイルの種類:
+                        </label>
+                        <select
+                            id="languageSelect"
+                            className="shadow border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
+                            value={selectedLanguage}
+                            onChange={(e) => setSelectedLanguage(e.target.value)}
+                        >
+                            {languageOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-        {message && (
-          <div className="mt-4 p-3 bg-blue-900 border border-blue-700 text-blue-200 rounded-md text-center shadow-md shadow-blue-500/30">
-            {message}
-          </div>
-        )}
-      </div>
-      <script src="https://cdn.tailwindcss.com"></script>
-    </div>
-  );
-}
+                    <div className="flex justify-center space-x-4 mb-4">
+                        <button
+                            onClick={handleDownloadToPC}
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-purple-500/30"
+                            disabled={!codeText}
+                        >
+                            PCにダウンロード
+                        </button>
+                        <button
+                            onClick={handleReset}
+                            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-red-500/30"
+                        >
+                            リセット
+                        </button>
+                    </div>
 
-export default App;
+                    {message && (
+                        <div className="mt-4 p-3 bg-blue-900 border border-blue-700 text-blue-200 rounded-md text-center shadow-md shadow-blue-500/30">
+                            {message}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Reactアプリをマウント
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
