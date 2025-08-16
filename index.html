@@ -1,0 +1,159 @@
+import React, { useState } from 'react';
+
+function App() {
+  const [codeText, setCodeText] = useState('');
+  const [fileName, setFileName] = useState(''); // State for filename
+  const [selectedLanguage, setSelectedLanguage] = useState('txt'); // New state for selected language, default to 'txt'
+  const [message, setMessage] = useState('');
+
+  // Options for programming languages and their extensions
+  const languageOptions = [
+    { label: 'テキストファイル (.txt)', value: 'txt' },
+    { label: 'JavaScript (.js)', value: 'js' },
+    { label: 'Python (.py)', value: 'py' },
+    { label: 'HTML (.html)', value: 'html' },
+    { label: 'CSS (.css)', value: 'css' },
+    { label: 'JSON (.json)', value: 'json' },
+    { label: 'Markdown (.md)', value: 'md' },
+    { label: 'Java (.java)', value: 'java' },
+    { label: 'C++ (.cpp)', value: 'cpp' },
+    { label: 'C# (.cs)', value: 'cs' },
+    { label: 'PHP (.php)', value: 'php' },
+    { label: 'Ruby (.rb)', value: 'rb' },
+    { label: 'Swift (.swift)', value: 'swift' },
+    { label: 'TypeScript (.ts)', value: 'ts' },
+    { label: 'XML (.xml)', value: 'xml' },
+  ];
+
+  const handleDownloadToPC = () => {
+    if (!codeText) {
+      setMessage("ダウンロードするテキストがありません。");
+      return;
+    }
+
+    let finalFileName = fileName.trim();
+    const extensionFromSelection = selectedLanguage;
+
+    // Check if the user-provided fileName already has an extension
+    const hasUserProvidedExtension = finalFileName.includes('.');
+
+    if (!hasUserProvidedExtension && extensionFromSelection) {
+      // If no extension in user-provided fileName and a language is selected, append the selected extension
+      if (finalFileName === '') {
+        finalFileName = `code_snippet.${extensionFromSelection}`;
+      } else {
+        finalFileName = `${finalFileName}.${extensionFromSelection}`;
+      }
+    } else if (finalFileName === '') {
+      // If fileName is empty and no specific language is selected (or default 'txt'), use default with .txt
+      finalFileName = `code_snippet.txt`;
+    }
+    // If hasUserProvidedExtension is true, finalFileName remains as is.
+
+    // Create a Blob from the codeText
+    const blob = new Blob([codeText], { type: 'text/plain' });
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    // Create a temporary anchor element
+    const a = document.createElement('a');
+    a.href = url;
+    // Set the download attribute to specify the filename
+    a.download = finalFileName;
+    // Programmatically click the anchor to trigger download
+    document.body.appendChild(a); // Append to body to ensure it's in the DOM
+    a.click();
+    // Clean up: remove the anchor and revoke the object URL
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setMessage(`'${finalFileName}' をPCにダウンロードしました。`);
+  };
+
+  // Function to handle reset button click
+  const handleReset = () => {
+    setCodeText(''); // Clear the code/text area
+    setFileName(''); // Clear the filename input
+    setSelectedLanguage('txt'); // Reset language selection to default
+    setMessage('入力内容がリセットされました。'); // Set a message
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-black flex flex-col items-center p-4 font-inter">
+      <div className="bg-gray-800 bg-opacity-70 border border-blue-700 p-6 rounded-lg shadow-lg shadow-blue-500/50 w-full max-w-3xl">
+        <h1 className="text-3xl font-bold text-center text-white mb-6 rounded-md p-2 bg-blue-800 shadow-md shadow-blue-500/30">
+          テキストファイル ダウンローダー
+        </h1>
+
+        <div className="mb-4">
+          <label htmlFor="codeText" className="block text-gray-200 text-sm font-bold mb-2">
+            コード/テキスト:
+          </label>
+          <textarea
+            id="codeText"
+            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700 h-64 resize-y font-mono"
+            value={codeText}
+            onChange={(e) => setCodeText(e.target.value)}
+            placeholder="ここにコードやテキストを入力してください..."
+          ></textarea>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="fileName" className="block text-gray-200 text-sm font-bold mb-2">
+            ファイル名 (オプション):
+          </label>
+          <input
+            type="text"
+            id="fileName"
+            className="shadow appearance-none border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder="例: my_script または my_notes"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="languageSelect" className="block text-gray-200 text-sm font-bold mb-2">
+            ファイルの種類:
+          </label>
+          <select
+            id="languageSelect"
+            className="shadow border border-gray-600 rounded-md w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400 bg-gray-700"
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+          >
+            {languageOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex justify-center space-x-4 mb-4">
+          <button
+            onClick={handleDownloadToPC}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-purple-500/30"
+            disabled={!codeText}
+          >
+            PCにダウンロード
+          </button>
+          <button
+            onClick={handleReset}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-red-500/30"
+          >
+            リセット
+          </button>
+        </div>
+
+        {message && (
+          <div className="mt-4 p-3 bg-blue-900 border border-blue-700 text-blue-200 rounded-md text-center shadow-md shadow-blue-500/30">
+            {message}
+          </div>
+        )}
+      </div>
+      <script src="https://cdn.tailwindcss.com"></script>
+    </div>
+  );
+}
+
+export default App;
