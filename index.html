@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストファイル作成・ダウンロードツール | 業務効率化ツール</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #002B5B;
+            --secondary-color: #007AFF;
+            --accent-color: #EBF8FF;
+            --text-color: #2D3748;
+            --light-text: #718096;
+            --bg-color: #F7FAFC;
+            --white: #FFFFFF;
+            --border-color: #E2E8F0;
+            --success-color: #38A169;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            background: white;
+            border-radius: 4px;
+            padding: 4px;
+            display: flex;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #FBFCFE;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #0062CC;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--accent-color);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .notice {
+            padding: 1rem;
+            background-color: #EDFDFD;
+            border-left: 4px solid #38B2AC;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: #2C7A7B;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--light-text);
+            font-size: 0.85rem;
+            margin-top: 4rem;
+            padding-bottom: 2rem;
+        }
+
+        .guide-step {
+            text-align: center;
+            padding: 1rem;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+        }
+
+        .step-number {
+            background: var(--accent-color);
+            color: var(--secondary-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .success-banner {
+            display: none;
+            background-color: var(--success-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+    <title>T-Port | テキストファイル作成・ダウンロードツール</title>
+</head>
+<body>
+
+<div id="success-banner" class="success-banner">ファイルを正常にダウンロードしました。</div>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <div>
+            <span style="font-size: 1.5rem; letter-spacing: -0.02em;">T-Port</span>
+            <div style="font-size: 0.75rem; opacity: 0.8; font-weight: 500; margin-top: -4px;">
+                テキストファイル作成・ダウンロードツール
+            </div>
+        </div>
+    </div>
+    <div style="font-size: 0.85rem; opacity: 0.9; font-weight: 500; text-align: right;">
+        安心・簡単なファイル生成ポータル
+    </div>
+</header>
+
+<div class="container">
+    <div class="notice">
+        <strong>お知らせ:</strong> 本システムで作成されたドキュメントは、ローカル環境に直接保存されます。サーバー側にはデータは保存されません。
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>新規ドキュメント作成</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="filename-group">ファイル名と拡張子</label>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="filename" placeholder="ファイル名を入力（例: data）" value="" style="flex: 1;">
+                        <select id="extension" onchange="toggleCustomExtension()" style="width: 140px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--white); font-family: inherit; font-size: 0.9rem;">
+                            <optgroup label="全般・テキスト">
+                                <option value=".txt">.txt (テキスト)</option>
+                                <option value=".csv">.csv (データ)</option>
+                                <option value=".md">.md (マークダウン)</option>
+                                <option value=".log">.log (ログ)</option>
+                                <option value=".pdf">.pdf (閲覧用)</option>
+                            </optgroup>
+                            <optgroup label="WEB・開発">
+                                <option value=".html">.html</option>
+                                <option value=".css">.css</option>
+                                <option value=".js">.js</option>
+                                <option value=".ts">.ts</option>
+                                <option value=".json">.json</option>
+                                <option value=".xml">.xml</option>
+                                <option value=".svg">.svg</option>
+                            </optgroup>
+                            <optgroup label="プログラミング">
+                                <option value=".py">.py (Python)</option>
+                                <option value=".java">.java (Java)</option>
+                                <option value=".cpp">.cpp (C++)</option>
+                                <option value=".c">.c (C言語)</option>
+                                <option value=".cs">.cs (C#)</option>
+                                <option value=".rb">.rb (Ruby)</option>
+                                <option value=".php">.php (PHP)</option>
+                                <option value=".sh">.sh (Shell)</option>
+                            </optgroup>
+                            <optgroup label="設定・データ">
+                                <option value=".yaml">.yaml / .yml</option>
+                                <option value=".sql">.sql</option>
+                                <option value=".env">.env</option>
+                                <option value=".conf">.conf</option>
+                                <option value=".ini">.ini</option>
+                            </optgroup>
+                            <optgroup label="その他">
+                                <option value="custom">直接入力...</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div id="custom-extension-container" style="display: none; align-items: center; gap: 0.5rem; animation: fadeIn 0.3s ease-out;">
+                        <span style="font-size: 0.85rem; color: var(--light-text);">カスタム拡張子:</span>
+                        <input type="text" id="custom-extension" placeholder=".png" style="width: 100px; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="content">ファイル内容</label>
+                <textarea id="content" placeholder="保存したいテキストをここに入力または貼り付けてください..."></textarea>
+            </div>
+            
+            <div class="actions">
+                <button type="button" class="btn btn-outline" onclick="clearForm()">入力をクリア</button>
+                <button type="button" class="btn btn-primary" onclick="downloadFile()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    ダウンロードを開始する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>ご利用ガイド（3ステップで完了）</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="guide-step">
+                    <div class="step-number">1</div>
+                    <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">内容を入力</h3>
+                    <p style="font-size: 0.8rem; color: var(--light-text);">「ファイル内容」欄にテキストを貼り付けるか直接入力します。</p>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">2</div>
+                    <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">ファイル設定</h3>
+                    <p style="font-size: 0.8rem; color: var(--light-text);">「ファイル名」を入力し、一覧から「拡張子」を選択します。</p>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">3</div>
+                    <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">保存</h3>
+                    <p style="font-size: 0.8rem; color: var(--light-text);">「ダウンロード」ボタンを押すと、お手元のPCに保存されます。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    &copy; 2026 T-Port | 安全・確実なファイル管理ソリューション
+</div>
+
+<script>
+    function toggleCustomExtension() {
+        const select = document.getElementById('extension');
+        const container = document.getElementById('custom-extension-container');
+        if (select.value === 'custom') {
+            container.style.display = 'flex';
+            document.getElementById('custom-extension').focus();
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    function downloadFile() {
+        const nameInput = document.getElementById('filename').value || 'document';
+        let extension = document.getElementById('extension').value;
+        
+        if (extension === 'custom') {
+            extension = document.getElementById('custom-extension').value;
+            if (extension && !extension.startsWith('.')) {
+                extension = '.' + extension;
+            }
+        }
+
+        const filename = nameInput.endsWith(extension) ? nameInput : nameInput + (extension || '');
+        const content = document.getElementById('content').value;
+        
+        if (!content) {
+            alert('内容を入力してください。');
+            return;
+        }
+
+        const blob = new Blob([content], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showSuccess();
+        }, 100);
+    }
+
+    function clearForm() {
+        if (confirm('入力をクリアしますか？')) {
+            document.getElementById('content').value = '';
+            document.getElementById('filename').value = '';
+            document.getElementById('extension').value = '.txt';
+            document.getElementById('custom-extension').value = '';
+            toggleCustomExtension();
+        }
+    }
+
+    function showSuccess() {
+        const banner = document.getElementById('success-banner');
+        banner.style.display = 'block';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
